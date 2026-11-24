@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ашық хат</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;1,400;1,700&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--night:#14122b;--dusk:#2a2358;--rose:#ff7a9c;--gold:#f3c969;--ivory:#fff4e6;
+ --serif:"Noto Serif",Georgia,serif;--sans:"Noto Sans",system-ui,sans-serif;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(120% 80% at 50% 0%,var(--dusk),var(--night) 65%) fixed;color:var(--ivory);font-family:var(--sans);line-height:1.7;min-height:100vh;overflow-x:hidden}
+#sky{position:fixed;inset:0;pointer-events:none;z-index:0}
+#sky i{position:absolute;width:2px;height:2px;border-radius:50%;background:var(--ivory);opacity:.5;animation:tw 4s ease-in-out infinite}
+@keyframes tw{50%{opacity:.1}}
+.fly{position:fixed;z-index:9;pointer-events:none;color:var(--rose);animation:up 2.2s ease-out forwards}
+@keyframes up{to{transform:translateY(-70vh) scale(1.6);opacity:0}}
+
+#intro{position:fixed;inset:0;z-index:5;display:grid;place-items:center;text-align:center;padding:24px;background:var(--night);transition:opacity .9s,visibility .9s}
+#intro.gone{opacity:0;visibility:hidden}
+#intro h1{font:italic 700 clamp(2rem,8vw,3.4rem)/1.15 var(--serif);margin:0 0 .4em;color:var(--gold)}
+#intro p{margin:2em 0 0;color:#cfc8e8}
+.env{position:relative;width:min(300px,78vw);aspect-ratio:3/2;margin:2.2em auto 0;cursor:pointer;border:0;background:none;padding:0;color:inherit;perspective:900px}
+.env:focus-visible{outline:3px solid var(--gold);outline-offset:8px}
+.env .back,.env .front{position:absolute;inset:0;border-radius:6px}
+.env .back{background:#e8d9bf}
+.env .paper{position:absolute;left:8%;right:8%;top:6%;height:80%;background:var(--ivory);border-radius:4px;transition:transform .8s .35s}
+.env .front{background:linear-gradient(135deg,transparent 49.5%,#d9c6a4 50%) left/50% 100% no-repeat,linear-gradient(225deg,transparent 49.5%,#d9c6a4 50%) right/50% 100% no-repeat,#f1e4cc;clip-path:polygon(0 0,50% 55%,100% 0,100% 100%,0 100%);}
+.env .flap{position:absolute;left:0;right:0;top:0;height:58%;background:#d9c6a4;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .6s}
+.env .seal{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px;border-radius:50%;background:var(--rose);display:grid;place-items:center;font-size:22px;color:var(--night);z-index:3;transition:opacity .3s;box-shadow:0 3px 10px #0005}
+.env.open .flap{transform:rotateX(180deg)}
+.env.open .seal{opacity:0}
+.env.open .paper{transform:translateY(-34%)}
+
+main{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:12vh 22px 14vh}
+.hero{text-align:center;margin-bottom:14vh}
+.hero h2{font:italic 700 clamp(3.2rem,16vw,6rem)/1 var(--serif);margin:0;color:var(--rose);text-shadow:0 0 40px #ff7a9c66}
+.hero p{font:italic 400 1.25rem var(--serif);color:var(--gold);margin:.8em 0 0}
+.letter{background:var(--ivory);color:#2b2340;padding:clamp(24px,6vw,46px);border-radius:4px;box-shadow:0 20px 60px #0007;transform:rotate(-.7deg)}
+.letter p{font:400 1.12rem/1.85 var(--serif);margin:0 0 1.1em;max-width:60ch}
+.letter .big{font:italic 700 1.6rem/1.35 var(--serif);color:#c2305a}
+.letter .sig{text-align:right;margin:1.6em 0 0;color:#c2305a}
+h3{font:italic 400 1.5rem var(--serif);text-align:center;margin:16vh 0 .3em;color:var(--gold)}
+.hint{text-align:center;color:#cfc8e8;margin:0 0 1.2em}
+svg{display:block;width:min(100%,380px);margin:0 auto;overflow:visible}
+.line{fill:none;stroke:var(--rose);stroke-width:1.6;stroke-dasharray:900;stroke-dashoffset:900;filter:drop-shadow(0 0 5px var(--rose))}
+.seen .line{animation:draw 3.5s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.st{cursor:pointer;outline:none}
+.st circle{fill:var(--gold);transition:r .2s}
+.st .halo{fill:var(--gold);opacity:.22;animation:tw 3s infinite}
+.st:hover circle:not(.halo),.st:focus-visible circle:not(.halo){r:9}
+.st:focus-visible .halo{stroke:var(--ivory);stroke-width:2}
+.st.on circle:not(.halo){fill:var(--ivory)}
+#msg{min-height:5.5em;text-align:center;font:italic 400 1.35rem/1.5 var(--serif);margin:1.6em auto 0;max-width:30ch}
+.song{text-align:center;margin-top:16vh}
+.song .t{font:italic 400 1.5rem var(--serif);color:var(--gold);margin:0 0 .2em}
+.song .a{color:#cfc8e8;margin:0 0 1.4em}
+button.play{font:500 1.05rem var(--sans);color:var(--ivory);background:transparent;border:2px solid var(--rose);border-radius:999px;padding:.8em 1.6em;cursor:pointer}
+button.play.on{background:var(--rose);color:var(--night);animation:beat 1.2s ease-in-out infinite}
+@keyframes beat{50%{transform:scale(1.05)}}
+button.play:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+.end{text-align:center;margin-top:16vh}
+.end .k{font:italic 700 clamp(2rem,9vw,3.2rem)/1.2 var(--serif);color:var(--rose);margin:0 0 .5em}
+button.hug{font:500 1.05rem var(--sans);color:var(--night);background:var(--gold);border:0;border-radius:999px;padding:.9em 1.8em;cursor:pointer}
+button.hug:active{transform:scale(.96)}
+button.hug:focus-visible{outline:3px solid var(--ivory);outline-offset:4px}
+.old{display:none}
+.foot{margin-top:5em;font-size:.85rem;color:#8e87b3;text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.line{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<div id="sky" aria-hidden="true"></div>
+
+<section id="intro">
+  <div>
+    <h1>Саған<br>хат келді</h1>
+    <button class="env" id="env" aria-label="Хатты ашу">
+      <span class="back"></span><span class="paper"></span><span class="front"></span><span class="flap"></span><span class="seal">♥</span>
+    </button>
+    <p>Ашу үшін конвертке бас</p>
+  </div>
+</section>
+
+<main>
+  <header class="hero">
+    <h2>Жаным</h2>
+    <p>менің жүрегімнің иесі</p>
+  </header>
+
+  <article class="letter">
+    <p class="big">Сүйікті жаным,</p>
+    <p>Сен менің өмірімдегі ең жарық жұлдызсың. Қасыңда болғанда уақыт тоқтап қалғандай, ал күлкің күн шуағындай жылытады.</p>
+    <p>Сенімен бірге өткен әрбір сәт – менің ең қымбат естелігім. Саған қарап отырып, бақыттың не екенін түсіндім.</p>
+    <p>Қуанышың да, қайғың да менімен бірге болсын. Мен әрдайым қасыңда боламын.</p>
+    <p class="big">Сені жақсы көремін!</p>
+    <p class="sig">Мәңгі сенікі ♥</p>
+  </article>
+
+  <h3>Сен үшін жағылған жұлдыздар</h3>
+  <p class="hint">Жұлдыздарға түртіп көр</p>
+  <div id="heart">
+    <svg viewBox="0 0 300 280" role="group" aria-label="Жүрек түріндегі шоқжұлдыз">
+      <path class="line" d="M150 250 C40 170 20 90 80 50 C115 28 145 45 150 75 C155 45 185 28 220 50 C280 90 260 170 150 250Z"/>
+      <g class="st" tabindex="0" role="button" aria-label="Жұлдыз 1" data-t="Күлкің – менің сүйікті әуенім." transform="translate(150 250)"><circle class="halo" r="16"/><circle r="6"/></g>
+      <g class="st" tabindex="0" role="button" aria-label="Жұлдыз 2" data-t="Көздерің түнгі аспандағы ең жарық жұлдыздан да нұрлы." transform="translate(51 135)"><circle class="halo" r="16"/><circle r="6"/></g>
+      <g class="st" tabindex="0" role="button" aria-label="Жұлдыз 3" data-t="Қасыңда мен өзімді үйімдегідей сезінемін." transform="translate(80 50)"><circle class="halo" r="16"/><circle r="6"/></g>
+      <g class="st" tabindex="0" role="button" aria-label="Жұлдыз 4" data-t="Сенімен болашағым әлдеқайда нұрлы." transform="translate(150 75)"><circle class="halo" r="16"/><circle r="6"/></g>
+      <g class="st" tabindex="0" role="button" aria-label="Жұлдыз 5" data-t="Сен – менің ең үлкен бақытым." transform="translate(220 50)"><circle class="halo" r="16"/><circle r="6"/></g>
+      <g class="st" tabindex="0" role="button" aria-label="Жұлдыз 6" data-t="Сені кездестіргеніме мың алғыс." transform="translate(249 135)"><circle class="halo" r="16"/><circle r="6"/></g>
+    </svg>
+    <p id="msg" aria-live="polite"></p>
+  </div>
+
+  <section class="end">
+    <p class="k">Сен – менің бақытым</p>
+    <button class="hug" id="hug">Құшақ жібер ♥</button>
+    <p class="foot">Саған арнап жасалды</p>
+  </section>
+</main>
+
+<script>
+(function(){
+  let sky=document.getElementById('sky');
+  for(var i=0;i<70;i++){var s=document.createElement('i');
+    s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';
+    s.style.animationDelay=(Math.random()*4)+'s';sky.appendChild(s);}
+
+  function hearts(x,y,n){
+    for(var i=0;i<n;i++){(function(i){setTimeout(function(){
+      var h=document.createElement('span');h.className='fly';h.textContent='♥';
+      h.style.left=(x+(Math.random()*80-40))+'px';h.style.top=y+'px';
+      h.style.fontSize=(14+Math.random()*22)+'px';
+      document.body.appendChild(h);setTimeout(function(){h.remove()},2300);
+    },i*90)})(i)}
+  }
+
+  var env=document.getElementById('env'),intro=document.getElementById('intro');
+  env.addEventListener('click',function(){
+    env.classList.add('open');
+    var r=env.getBoundingClientRect();hearts(r.left+r.width/2,r.top+r.height/2,8);
+    setTimeout(function(){intro.classList.add('gone');window.scrollTo(0,0)},1500);
+  });
+
+  let heart=document.getElementById('heart');
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(e,o){if(e[0].isIntersecting){heart.classList.add('seen');o.disconnect()}},{threshold:.4}).observe(heart);
+  }else heart.classList.add('seen');
+
+  let msg=document.getElementById('msg');
+  function showMsg(g){
+    document.querySelectorAll('.st').forEach(function(n){n.classList.remove('on')});
+    g.classList.add('on');msg.textContent=g.getAttribute('data-t');
+    var r=g.getBoundingClientRect();hearts(r.left+r.width/2,r.top,3);
+  }
+  document.querySelectorAll('.st').forEach(function(g){
+    g.addEventListener('click',function(){showMsg(g)});
+    g.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();showMsg(g)}});
+  });
+
+  document.getElementById('hug').addEventListener('click',function(e){
+    var r=e.currentTarget.getBoundingClientRect();hearts(r.left+r.width/2,r.top,18);
+    this.textContent='Мен де сені жақсы көремін ♥';
+  });
+})();
+</script>
+</body>
+</html>
